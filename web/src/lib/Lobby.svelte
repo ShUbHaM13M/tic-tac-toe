@@ -1,14 +1,14 @@
 <script lang="ts">
-  import { MessageType, socket } from "../store/store";
-  import { flash } from "../store/store";
+  import { MessageType, socket, flash, currentGame } from "../store/store";
   import { createEventDispatcher, onDestroy } from "svelte";
 
   const dispatch = createEventDispatcher<{
-    "start-game": { roomID: string };
+    "start-game": { roomID: string; username: string };
   }>();
 
   let roomConnected = false;
   let roomID = "";
+  let username = "";
   let totalConnectedPlayers = 0;
   let countdown = 0;
 
@@ -21,6 +21,7 @@
       label: "Connected to a room.",
       type: MessageType.SUCCESS,
     };
+    $currentGame = { roomID };
     if (totalConnectedPlayers >= 2) startCountdown();
   });
 
@@ -35,7 +36,7 @@
     const interval = setInterval(() => {
       if (countdown >= 5) {
         clearInterval(interval);
-        dispatch("start-game", { roomID });
+        dispatch("start-game", { roomID, username });
         return;
       }
       countdown = countdown + 1;
@@ -49,7 +50,7 @@
 
   function onClick() {
     if ($socket) {
-      $socket.emit("join", { roomID });
+      $socket.emit("join", { roomID, username });
     }
   }
 
@@ -107,7 +108,14 @@
     <hr />
     <div class="input-container">
       <label for="name">Name</label>
-      <input type="text" placeholder="Name" name="name" id="name" pattern="" />
+      <input
+        bind:value={username}
+        type="text"
+        placeholder="Name"
+        name="name"
+        id="name"
+        pattern=""
+      />
     </div>
     <div class="input-container">
       <label for="room_id">Enter Room ID: </label>

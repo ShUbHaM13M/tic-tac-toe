@@ -1,8 +1,31 @@
 <script lang="ts">
+  import { onDestroy } from "svelte";
+  import { socket, currentGame } from "../store/store";
+
   export let value: string | undefined;
+  export let opponentHovering = false;
+  export let index: number;
+
+  $: if (opponentHovering === true) {
+    setTimeout(() => {
+      opponentHovering = false;
+    }, 2000);
+  }
+
+  onDestroy(() => {
+    $socket.removeListener();
+  });
 </script>
 
-<button disabled={value !== undefined} on:click class="cell">
+<button
+  disabled={value !== undefined}
+  on:click
+  class="cell"
+  class:opponentHovering
+  on:mouseenter={() => {
+    $socket.emit("hover", { cellNumber: index, roomID: $currentGame.roomID });
+  }}
+>
   {value ? value : ""}
 </button>
 
@@ -14,7 +37,7 @@
     border: none;
     color: white;
     font-size: 1.2rem;
-    transition: all ease-out 100ms;
+    transition: all ease-out 200ms;
     cursor: pointer;
     outline: none;
   }
@@ -46,5 +69,8 @@
   .cell:nth-child(5),
   .cell:nth-child(6) {
     border-block: 2px solid rgba(255, 255, 255, 0.1);
+  }
+  .cell.opponentHovering {
+    background-color: rgba(255, 0, 0, 0.4);
   }
 </style>

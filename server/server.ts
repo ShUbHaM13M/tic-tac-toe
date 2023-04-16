@@ -34,6 +34,10 @@ io.on('connection', (socket: Socket) => {
     console.log(index, currentTurn)
   })
 
+  socket.on("hover", ({ cellNumber, roomID }) => {
+    socket.broadcast.to(roomID).emit("player-hovering", { cellNumber })
+  })
+
   socket.on("join", ({ roomID }) => {
     const connectedClients = io.sockets.adapter.rooms.get(roomID)
 

@@ -4,11 +4,13 @@ export interface ServerToClientEvents {
 	"too-many-clients": () => void;
 	"room-joined": ({ totalPlayers }: { totalPlayers: number }) => void;
 	"player-joined": ({ totalPlayers }: { totalPlayers: number }) => void;
+	"player-hovering": ({ cellNumber }: { cellNumber: number }) => void;
 }
 
 export interface ClientToServerEvents {
 	move: ({ index, currentTurn }: { index: number, currentTurn: string }) => void;
-	join: ({ roomID }: { roomID: string }) => void
+	join: ({ roomID, username }: { roomID: string, username: string }) => void;
+	hover: ({ cellNumber, roomID }: { cellNumber: number, roomID: string }) => void
 }
 
 export interface InterServerEvents {

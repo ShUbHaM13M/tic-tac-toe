@@ -12,6 +12,11 @@
   let state = Array.from<undefined | TurnTypes>({ length: 9 }).fill(undefined);
 
   let winner: TurnTypes = null;
+  let opponentHovering: number = null;
+
+  $socket.on("player-hovering", ({ cellNumber }) => {
+    opponentHovering = cellNumber;
+  });
 
   const win_matrix = [
     [0, 1, 2],
@@ -58,7 +63,12 @@
 
 <div style={`pointer-events: ${winner ? "none" : "auto"}`} class="board">
   {#each state as cellState, index}
-    <Cell on:click={() => onCellClick(index)} value={cellState} />
+    <Cell
+      opponentHovering={opponentHovering === index}
+      on:click={() => onCellClick(index)}
+      value={cellState}
+      {index}
+    />
   {/each}
 </div>
 

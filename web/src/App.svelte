@@ -3,7 +3,7 @@
   import { fly } from "svelte/transition";
   import Board from "./lib/Board.svelte";
   import { io } from "socket.io-client";
-  import { socket, flash, MessageType } from "./store/store.ts";
+  import { socket, flash, MessageType, currentGame } from "./store/store.ts";
   import Lobby from "./lib/Lobby.svelte";
 
   $: if ($flash) {
@@ -11,7 +11,6 @@
   }
 
   let startGame = false;
-  let currentRoomID = "";
 
   $socket = io("localhost:3000");
 
@@ -19,8 +18,7 @@
     console.log("Connected");
   });
 
-  function onStartGame(a: CustomEvent<{ roomID: string }>) {
-    currentRoomID = a.detail.roomID;
+  $: if ($currentGame?.roomID) {
     startGame = true;
   }
 
@@ -31,9 +29,9 @@
 
 <main>
   {#if startGame}
-    <Board roomID={currentRoomID} />
+    <Board roomID={$currentGame.roomID} />
   {:else}
-    <Lobby on:start-game={onStartGame} />
+    <Lobby />
   {/if}
   {#if $flash}
     <div

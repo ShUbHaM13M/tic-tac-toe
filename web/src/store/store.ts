@@ -13,5 +13,5 @@ interface Message {
 }
 
 export const socket = writable<Socket<ServerToClientEvents, ClientToServerEvents>>();
-
 export const flash = writable<Message>();
+export const currentGame = writable<{ roomID: string }>();
