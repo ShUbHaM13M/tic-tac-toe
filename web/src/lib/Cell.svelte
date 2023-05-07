@@ -18,11 +18,13 @@
 </script>
 
 <button
-  disabled={value !== undefined}
   on:click
   class="cell"
   class:opponentHovering
   on:mouseenter={() => {
+    $socket.emit("hover", { cellNumber: index, roomID: $currentGame.roomID });
+  }}
+  on:pointerdown={() => {
     $socket.emit("hover", { cellNumber: index, roomID: $currentGame.roomID });
   }}
 >
@@ -31,11 +33,12 @@
 
 <style>
   button {
-    height: 100px;
-    width: 100px;
+    --size: 80px;
+    height: var(--size);
+    width: var(--size);
     background-color: #232323;
     border: none;
-    color: white;
+    color: #fefefe;
     font-size: 1.2rem;
     transition: all ease-out 200ms;
     cursor: pointer;
@@ -71,6 +74,6 @@
     border-block: 2px solid rgba(255, 255, 255, 0.1);
   }
   .cell.opponentHovering {
-    background-color: rgba(255, 0, 0, 0.4);
+    background-color: rgba(145, 0, 0, 0.4);
   }
 </style>

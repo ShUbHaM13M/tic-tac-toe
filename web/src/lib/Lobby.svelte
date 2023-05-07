@@ -14,14 +14,19 @@
 
   $: roomID = roomID.replaceAll(" ", "");
 
-  $socket.on("room-joined", ({ totalPlayers }) => {
+  $socket.on("room-joined", ({ totalPlayers, assignedTurn, currentTurn }) => {
     totalConnectedPlayers = totalPlayers;
     roomConnected = true;
     $flash = {
       label: "Connected to a room.",
       type: MessageType.SUCCESS,
     };
-    $currentGame = { roomID };
+    $currentGame.assignedTurn = assignedTurn;
+    $currentGame = {
+      ...$currentGame,
+      assignedTurn,
+      currentTurn,
+    };
     if (totalConnectedPlayers >= 2) startCountdown();
   });
 

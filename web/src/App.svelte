@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onDestroy } from "svelte";
   import { fly } from "svelte/transition";
-  import Board from "./lib/Board.svelte";
+  import Board, { type TurnType } from "./lib/Board.svelte";
   import { io } from "socket.io-client";
   import { socket, flash, MessageType, currentGame } from "./store/store.ts";
   import Lobby from "./lib/Lobby.svelte";
@@ -9,6 +9,13 @@
   $: if ($flash) {
     setTimeout(() => ($flash = null), 3000);
   }
+
+  $currentGame = {
+    roomID: "",
+    assignedTurn: "X",
+    currentTurn: "X",
+    state: Array.from<undefined | TurnType>({ length: 9 }).fill(undefined),
+  };
 
   let startGame = false;
 
@@ -18,10 +25,6 @@
     console.log("Connected");
   });
 
-  $: if ($currentGame?.roomID) {
-    startGame = true;
-  }
-
   onDestroy(() => {
     $socket.disconnect();
   });
@@ -29,9 +32,14 @@
 
 <main>
   {#if startGame}
-    <Board roomID={$currentGame.roomID} />
+    <Board />
   {:else}
-    <Lobby />
+    <Lobby
+      on:start-game={({ detail }) => {
+        $currentGame.roomID = detail.roomID;
+        startGame = true;
+      }}
+    />
   {/if}
   {#if $flash}
     <div
