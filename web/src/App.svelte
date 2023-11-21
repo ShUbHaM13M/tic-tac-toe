@@ -19,7 +19,7 @@
 
   let startGame = false;
 
-  $socket = io("localhost:3000");
+  $socket = io(import.meta.env.VITE_HOST || "localhost:3000");
 
   $socket.on("connect", () => {
     console.log("Connected");

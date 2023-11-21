@@ -2,6 +2,19 @@
 import Koa from 'koa';
 import { createServer } from 'http';
 import { Server as SocketIOServer, Socket } from 'socket.io';
+import os from 'os'
+
+const networkInterfaces = os.networkInterfaces();
+let ip = "localhost";
+if (networkInterfaces['Wi-Fi']) {
+  const netWorkInterface = networkInterfaces['Wi-Fi'].find(ip => ip.family === 'IPv4')
+  if (netWorkInterface)
+    ip = netWorkInterface?.address
+} else if (networkInterfaces['eth0']) {
+  const netWorkInterface = networkInterfaces['eth0'].find(ip => ip.family === 'IPv4')
+  if (netWorkInterface)
+    ip = netWorkInterface?.address
+}
 
 const app = new Koa();
 
@@ -59,7 +72,7 @@ const games = new Map<string, {
 }>();
 
 io.on('connection', (socket: Socket) => {
-  console.log(`${ socket.id }: connected`)
+  console.log(`${socket.id}: connected`)
   let joinedRoom: string | null = null
 
   socket.on("move", ({ index, roomID, currentTurn }) => {
@@ -119,7 +132,7 @@ io.on('connection', (socket: Socket) => {
   })
 
   socket.on("disconnect", () => {
-    console.log(`${ socket.id }: disconnected`)
+    console.log(`${socket.id}: disconnected`)
     if (joinedRoom) {
       const totalPlayers = io.sockets.adapter.rooms.get(joinedRoom)
       if (totalPlayers?.size) return
@@ -130,6 +143,9 @@ io.on('connection', (socket: Socket) => {
 
 const PORT = process.env.PORT || 3000
 
-server.listen(PORT, () => {
-  console.log(`Server listening on: localhost:${ PORT }`)
+server.listen({
+  host: ip,
+  port: PORT,
+}, () => {
+  console.log(`Server listening on: ${ip}:${PORT}`)
 });
